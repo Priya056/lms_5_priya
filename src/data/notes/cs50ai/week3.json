@@ -1,0 +1,62 @@
+{
+  "title": "Week 3 — Optimization",
+  "source": "CS50 AI 2024 — Lecture 3",
+  "content": "# Optimization: Finding the Best Solution\n\n## Introduction\n\nOptimization problems seek to find the best solution from a set of candidates. Whether maximizing profit, minimizing cost, or satisfying constraints, optimization is central to AI.\n\n## Local Search\n\nLocal search algorithms explore neighbors of current solution, moving to better solutions.\n\n### Hill Climbing\n\nAlways move to the steepest uphill neighbor:\n\n```python\ndef hill_climbing(initial_state):\n    \"\"\"Hill climbing optimization.\"\"\"\n    current = initial_state\n    \n    while True:\n        # Find best neighbor\n        neighbors = get_neighbors(current)\n        neighbor_values = [value(n) for n in neighbors]\n        best_neighbor = neighbors[neighbor_values.index(max(neighbor_values))]\n        \n        # Stop if no improvement\n        if value(best_neighbor) <= value(current):\n            return current\n        \n        current = best_neighbor\n```\n\n**Properties**:\n- Local optimum: Gets stuck in local maxima\n- Incomplete: May not find global optimum\n- Time: Linear in state space\n- Space: Constant\n\n### Steepest Ascent Hill Climbing\n\nVariation that considers all neighbors:\n\n```python\ndef steepest_ascent(initial_state):\n    \"\"\"Find neighbor with highest value.\"\"\"\n    current = initial_state\n    \n    while True:\n        neighbors = get_neighbors(current)\n        if not neighbors:\n            return current\n        \n        best = max(neighbors, key=value)\n        if value(best) <= value(current):\n            return current\n        \n        current = best\n```\n\n### Sideways Movement\n\nAllow moves to equally valued neighbors to escape plateaus:\n\n```python\ndef hill_climbing_with_sideways(initial_state, max_sideways=100):\n    \"\"\"Allow sideways moves up to max_sideways.\"\"\"\n    current = initial_state\n    sideways_count = 0\n    \n    while True:\n        neighbors = get_neighbors(current)\n        best = max(neighbors, key=value)\n        \n        if value(best) > value(current):\n            current = best\n            sideways_count = 0\n        elif value(best) == value(current) and sideways_count < max_sideways:\n            current = best\n            sideways_count += 1\n        else:\n            return current\n```\n\n## Simulated Annealing\n\nAllows moves to worse solutions with decreasing probability:\n\n```python\nimport math\nimport random\n\ndef simulated_annealing(initial_state, schedule):\n    \"\"\"Simulated annealing optimization.\"\"\"\n    current = initial_state\n    \n    for t in range(1, 1000):\n        temperature = schedule(t)\n        if temperature == 0:\n            return current\n        \n        # Select random neighbor\n        neighbor = random_neighbor(current)\n        delta_e = value(neighbor) - value(current)\n        \n        # Always accept better solution\n        if delta_e > 0:\n            current = neighbor\n        # Accept worse with probability\n        elif random.random() < math.exp(delta_e / temperature):\n            current = neighbor\n    \n    return current\n```\n\nSchedule function determines temperature over time:\n\n```python\ndef linear_schedule(t):\n    \"\"\"Linear temperature schedule.\"\"\"\n    return max(0, 1000 - t)\n\ndef exponential_schedule(t):\n    \"\"\"Exponential temperature schedule.\"\"\"\n    return 1000 * (0.99 ** t)\n```\n\n## Constraint Satisfaction Problems (CSP)\n\nCSPs consist of:\n- **Variables**: X₁, X₂, ..., Xₙ\n- **Domains**: D₁, D₂, ..., Dₙ (possible values for each)\n- **Constraints**: Restrictions on variable assignments\n\nExample: Graph coloring\n- Variables: Each node\n- Domains: {Red, Green, Blue}\n- Constraints: Adjacent nodes have different colors\n\n### Backtracking Search\n\nSystematically try assignments, backtracking when conflicts arise:\n\n```python\ndef backtrack(assignment, csp):\n    \"\"\"CSP backtracking search.\"\"\"\n    if is_complete(assignment, csp):\n        return assignment\n    \n    # Select unassigned variable\n    var = select_unassigned_variable(assignment, csp)\n    \n    for value in order_domain_values(var, assignment, csp):\n        if is_consistent(var, value, assignment, csp):\n            # Make assignment\n            assignment[var] = value\n            result = backtrack(assignment, csp)\n            \n            # If successful, return\n            if result is not None:\n                return result\n            \n            # Backtrack\n            del assignment[var]\n    \n    return None\n```\n\n### Arc Consistency (AC-3)\n\nReduce domain sizes before search:\n\n```python\ndef ac3(csp):\n    \"\"\"AC-3 constraint satisfaction algorithm.\"\"\"\n    queue = [(Xi, Xj) for Xi in csp.variables for Xj in csp.neighbors[Xi]]\n    \n    while queue:\n        Xi, Xj = queue.pop(0)\n        \n        if revise(csp, Xi, Xj):\n            if len(csp.domains[Xi]) == 0:\n                return False  # No solution possible\n            \n            for Xk in csp.neighbors[Xi]:\n                if Xk != Xj:\n                    queue.append((Xk, Xi))\n    \n    return True\n\ndef revise(csp, Xi, Xj):\n    \"\"\"Remove values from Xi domain inconsistent with Xj.\"\"\"\n    revised = False\n    \n    for x in csp.domains[Xi][:]:\n        if not any(csp.constraints_satisfied(Xi, x, Xj, y) for y in csp.domains[Xj]):\n            csp.domains[Xi].remove(x)\n            revised = True\n    \n    return revised\n```\n\n### Variable and Value Ordering\n\nImprove search efficiency through smart choices:\n\n```python\ndef minimum_remaining_values(assignment, csp):\n    \"\"\"Select variable with smallest domain (MRV heuristic).\"\"\"\n    return min([v for v in csp.variables if v not in assignment],\n               key=lambda v: len(csp.domains[v]))\n\ndef least_constraining_value(var, assignment, csp):\n    \"\"\"Order values by how many constraints they impose.\"\"\"\n    return sorted(csp.domains[var],\n                  key=lambda value: count_conflicts(var, value, assignment, csp))\n```\n\n## Linear Programming\n\nOptimize linear objective function subject to linear constraints:\n\n```\nMaximize: 3x + 2y\nSubject to:\n  x + y ≤ 4\n  x ≤ 2\n  y ≤ 3\n  x, y ≥ 0\n```\n\nUsing scipy:\n\n```python\nfrom scipy.optimize import linprog\n\n# Minimize -3x - 2y (equivalent to maximizing 3x + 2y)\nc = [-3, -2]\n\n# Inequality constraints: A_ub @ x <= b_ub\nA_ub = [[1, 1], [1, 0], [0, 1]]\nb_ub = [4, 2, 3]\n\n# Bounds for variables\nx_bounds = (0, None)\ny_bounds = (0, None)\n\nresult = linprog(c, A_ub=A_ub, b_ub=b_ub, bounds=[x_bounds, y_bounds])\nprint(result.fun)  # Optimal value\nprint(result.x)    # Optimal solution\n```\n\n## Practical Example: TSP (Traveling Salesman)\n\n```python\nimport random\nimport math\n\ndef distance(city1, city2):\n    \"\"\"Euclidean distance between cities.\"\"\"\n    return math.sqrt((city1[0] - city2[0])**2 + (city1[1] - city2[1])**2)\n\ndef tour_length(tour, cities):\n    \"\"\"Calculate total tour distance.\"\"\"\n    length = 0\n    for i in range(len(tour)):\n        length += distance(cities[tour[i]], cities[tour[(i + 1) % len(tour)]])\n    return length\n\ndef nearest_neighbor(cities):\n    \"\"\"Greedy nearest neighbor heuristic.\"\"\"\n    unvisited = set(range(len(cities)))\n    current = 0\n    tour = [current]\n    unvisited.remove(current)\n    \n    while unvisited:\n        nearest = min(unvisited, key=lambda city: distance(cities[current], cities[city]))\n        tour.append(nearest)\n        unvisited.remove(nearest)\n        current = nearest\n    \n    return tour\n```\n\n## Summary\n\nLocal search algorithms explore neighbors seeking improvement. Hill climbing moves to steepest uphill neighbor but gets stuck in local optima. Simulated annealing accepts worse solutions with decreasing probability to escape local optima. Constraint satisfaction problems use backtracking with pruning (arc consistency) and smart variable/value ordering. Linear programming optimizes linear objectives under linear constraints. These techniques solve diverse optimization problems from scheduling to routing.",
+  "quiz": [
+    {
+      "question": "What is the main limitation of hill climbing?",
+      "options": ["A. Too slow", "B. Gets stuck in local optima", "C. Uses too much memory", "D. Can't handle complex problems"],
+      "correct": 1
+    },
+    {
+      "question": "How does simulated annealing escape local optima?",
+      "options": ["A. Always moves uphill", "B. Accepts worse solutions with decreasing probability", "C. Random restart", "D. Uses multiple climbers"],
+      "correct": 1
+    },
+    {
+      "question": "What does the AC-3 algorithm do?",
+      "options": ["A. Finds optimal tour", "B. Enforces arc consistency in CSP", "C. Calculates heuristics", "D. Schedules variables"],
+      "correct": 1
+    },
+    {
+      "question": "What does MRV heuristic select?",
+      "options": ["A. Value with most constraints", "B. Variable with smallest domain", "C. Variable with most constraints", "D. Most recent variable"],
+      "correct": 1
+    }
+  ],
+  "flashcards": [
+    {
+      "front": "What is the main advantage and disadvantage of hill climbing?",
+      "back": "Advantage: Simple and fast, often finds good solutions quickly. Disadvantage: Gets stuck in local optima and cannot escape to find global optima. It only considers neighbors and stops when no uphill move exists."
+    },
+    {
+      "front": "How does simulated annealing enable escape from local optima?",
+      "back": "Simulated annealing accepts moves to worse solutions with probability proportional to e^(ΔE/T), where T is temperature. As temperature decreases over time, the probability of accepting bad moves decreases, allowing escape from local optima early on."
+    },
+    {
+      "front": "What are the three components of a Constraint Satisfaction Problem (CSP)?",
+      "back": "1) Variables: X1, X2, ..., Xn to be assigned values. 2) Domains: D1, D2, ..., Dn specifying possible values for each variable. 3) Constraints: Restrictions on which value combinations are allowed."
+    },
+    {
+      "front": "What is arc consistency (AC) and why is it useful?",
+      "back": "Arc consistency (Xi, Xj) means every value of Xi has a consistent value in Xj satisfying the constraint between them. Enforcing arc consistency before backtracking search reduces domain sizes and prunes impossible branches, improving efficiency."
+    },
+    {
+      "front": "What does the Minimum Remaining Values (MRV) heuristic do?",
+      "back": "MRV selects the unassigned variable with the smallest domain. This heuristic reduces branching factor early by constraining the most restrictive variables first, often leading to faster solutions."
+    },
+    {
+      "front": "What is the difference between hill climbing and steepest ascent?",
+      "back": "Hill climbing moves to the first improving neighbor found. Steepest ascent evaluates all neighbors and moves to the best one. Steepest ascent is more likely to escape plateaus and reach better optima but is slower."
+    },
+    {
+      "front": "How does backtracking search work in CSPs?",
+      "back": "Backtracking search assigns values to variables one at a time, checking constraints. If a conflict is found, it backtracks and tries a different value. Pruning (arc consistency) reduces the search space significantly."
+    },
+    {
+      "front": "What is linear programming used for in optimization?",
+      "back": "Linear programming optimizes a linear objective function subject to linear constraints. It's used for problems like maximizing profit or minimizing cost under resource constraints, solved efficiently with algorithms like simplex."
+    }
+  ],
+  "summary": "Week 3 covered optimization techniques for finding best solutions. Local search algorithms (hill climbing, simulated annealing) explore neighbors, with simulated annealing accepting worse solutions to escape local optima. Constraint satisfaction problems use backtracking with arc consistency and smart ordering heuristics. Linear programming optimizes linear objectives under linear constraints. These techniques solve diverse problems from scheduling to routing to traveling salesman problem."
+}

@@ -1,0 +1,8 @@
+[
+  {"front": "What is the difference between DFS and BFS?", "back": "DFS explores as far as possible before backtracking, BFS explores all neighbors at current distance first."},
+  {"front": "Which search algorithm guarantees shortest path?", "back": "BFS (breadth-first search) guarantees shortest path when all edge costs are equal."},
+  {"front": "What is A* search?", "back": "Combines actual cost from start with heuristic estimate to goal: f(n) = g(n) + h(n)."},
+  {"front": "What makes a heuristic admissible?", "back": "It never overestimates the actual cost to reach the goal."},
+  {"front": "What is minimax algorithm?", "back": "Algorithm for adversarial search where maximizer and minimizer alternate choosing best moves."},
+  {"front": "What does alpha-beta pruning do?", "back": "Eliminates branches in minimax that can't affect the final result, improving efficiency."}
+]

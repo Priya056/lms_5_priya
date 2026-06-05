@@ -1,0 +1,62 @@
+{
+  "title": "Week 6 — Language",
+  "source": "CS50 AI 2024 — Lecture 6",
+  "content": "# Natural Language Processing: Understanding Language\n\n## Introduction\n\nNatural Language Processing (NLP) enables machines to understand and generate human language. It encompasses tasks from text classification to translation to dialogue.\n\n## Tokenization\n\nBreak text into individual tokens (words, subwords, characters):\n\n```python\nimport nltk\nfrom nltk.tokenize import word_tokenize, sent_tokenize\n\ntext = \"Hello, world! How are you?\"\n\n# Word tokenization\nwords = word_tokenize(text)\nprint(words)  # ['Hello', ',', 'world', '!', 'How', 'are', 'you', '?']\n\n# Sentence tokenization\nsentences = sent_tokenize(text)\nprint(sentences)  # ['Hello, world!', 'How are you?']\n```\n\n## N-grams\n\nN-grams are sequences of n consecutive tokens:\n\n```python\nfrom nltk.util import ngrams\n\nwords = ['I', 'love', 'machine', 'learning']\n\nbigrams = list(ngrams(words, 2))\nprint(bigrams)  # [('I', 'love'), ('love', 'machine'), ('machine', 'learning')]\n\ntrigrams = list(ngrams(words, 3))\nprint(trigrams)  # [('I', 'love', 'machine'), ('love', 'machine', 'learning')]\n```\n\nN-gram language models predict next word based on previous n-1 words.\n\n## Bag of Words\n\nRepresent text as word frequencies:\n\n```python\nfrom sklearn.feature_extraction.text import CountVectorizer\n\ncorpus = [\n    'I love machine learning',\n    'Machine learning is great',\n    'I love Python'\n]\n\nvectorizer = CountVectorizer()\nX = vectorizer.fit_transform(corpus)\nprint(X.toarray())\n# [[1, 1, 0, 1, 0, 1],\n#  [0, 1, 1, 0, 1, 1],\n#  [1, 1, 0, 0, 0, 1]]\n```\n\nSimple but loses word order and context.\n\n## TF-IDF (Term Frequency-Inverse Document Frequency)\n\nWeights words by importance:\n\n```python\nfrom sklearn.feature_extraction.text import TfidfVectorizer\n\nvectorizer = TfidfVectorizer()\nX = vectorizer.fit_transform(corpus)\nprint(X.toarray())\n```\n\nFormula:\n```\nTF-IDF(term, doc) = TF(term, doc) * IDF(term)\nIDF(term) = log(N / n_docs_with_term)\n```\n\n## Word Embeddings\n\nRepresent words as dense vectors capturing semantic meaning.\n\n### Word2Vec\n\nSkip-gram model predicts context from target word:\n\n```python\nfrom gensim.models import Word2Vec\n\nsentences = [\n    ['machine', 'learning', 'is', 'powerful'],\n    ['deep', 'learning', 'uses', 'neural', 'networks']\n]\n\nmodel = Word2Vec(sentences, vector_size=100, window=3, min_count=1)\n\n# Get word vector\nvector = model.wv['learning']\nprint(vector.shape)  # (100,)\n\n# Find similar words\nsimilar = model.wv.most_similar('learning', topn=3)\nprint(similar)\n\n# Perform analogies\nresult = model.wv.most_similar(positive=['king', 'woman'], negative=['man'])\nprint(result)  # Should be close to 'queen'\n```\n\n### GloVe\n\nCombines matrix factorization with word co-occurrence statistics.\n\n## Transformer Architecture\n\nTransformers revolutionized NLP through self-attention:\n\n```\nSelf-Attention(Q, K, V) = softmax(QK^T / √d) V\n```\n\nWhere Q (query), K (key), V (value) are learned projections.\n\n## BERT (Bidirectional Encoder Representations from Transformers)\n\nBidirectional pre-training on masked language modeling:\n\n```python\nfrom transformers import AutoTokenizer, AutoModel\n\ntokenizer = AutoTokenizer.from_pretrained(\"bert-base-uncased\")\nmodel = AutoModel.from_pretrained(\"bert-base-uncased\")\n\ntext = \"Machine learning is fascinating\"\ninputs = tokenizer(text, return_tensors=\"pt\")\noutputs = model(**inputs)\n\n# Get token embeddings\ntoken_embeddings = outputs.last_hidden_state\nprint(token_embeddings.shape)  # (1, num_tokens, 768)\n```\n\nBERT is pre-trained on masked language modeling (MLM) and next sentence prediction (NSP).\n\n## GPT (Generative Pre-trained Transformer)\n\nUnidirectional language model for text generation:\n\n```python\nfrom transformers import GPT2Tokenizer, GPT2LMHeadModel\nimport torch\n\ntokenizer = GPT2Tokenizer.from_pretrained(\"gpt2\")\nmodel = GPT2LMHeadModel.from_pretrained(\"gpt2\")\n\nprompt = \"Once upon a time\"\ninput_ids = tokenizer.encode(prompt, return_tensors=\"pt\")\n\noutput = model.generate(input_ids, max_length=50)\ntext = tokenizer.decode(output[0])\nprint(text)\n```\n\n## Attention Mechanism\n\nAttention computes weighted sum of values based on query-key similarity:\n\n```python\nimport torch\nimport torch.nn as nn\n\nclass AttentionLayer(nn.Module):\n    def __init__(self, hidden_dim):\n        super().__init__()\n        self.query = nn.Linear(hidden_dim, hidden_dim)\n        self.key = nn.Linear(hidden_dim, hidden_dim)\n        self.value = nn.Linear(hidden_dim, hidden_dim)\n    \n    def forward(self, x):\n        Q = self.query(x)  # (batch, seq_len, hidden_dim)\n        K = self.key(x)\n        V = self.value(x)\n        \n        # Compute attention scores\n        scores = torch.matmul(Q, K.transpose(-2, -1)) / (K.shape[-1] ** 0.5)\n        weights = torch.softmax(scores, dim=-1)\n        \n        # Apply attention to values\n        output = torch.matmul(weights, V)\n        return output\n```\n\n## Practical Example: Sentiment Analysis\n\n```python\nfrom transformers import pipeline\n\n# Zero-shot sentiment classification\nclassifier = pipeline(\"sentiment-analysis\")\n\ntexts = [\n    \"I love this product!\",\n    \"This is terrible\",\n    \"It's okay, nothing special\"\n]\n\nfor text in texts:\n    result = classifier(text)\n    print(f\"{text}: {result}\")\n```\n\n## Language Models\n\nAutoregressive models predict next token given previous tokens:\n\n```python\ndef language_model_prediction(model, context, num_predictions=10):\n    \"\"\"Generate text from language model.\"\"\"\n    output = context\n    \n    for _ in range(num_predictions):\n        # Predict next token\n        next_token_probs = model(output)\n        next_token = sample_from_distribution(next_token_probs)\n        output.append(next_token)\n    \n    return output\n```\n\n## Sequence-to-Sequence Models\n\nTranslate input sequences to output sequences:\n\n```python\nfrom transformers import MarianMTModel, MarianTokenizer\n\nmodel_name = \"Helsinki-NLP/Opus-MT-en-es\"\ntokenizer = MarianTokenizer.from_pretrained(model_name)\nmodel = MarianMTModel.from_pretrained(model_name)\n\ntext = \"Good morning\"\ninputs = tokenizer(text, return_tensors=\"pt\")\noutputs = model.generate(**inputs)\ntranslation = tokenizer.decode(outputs[0], skip_special_tokens=True)\nprint(translation)  # \"Buenos días\"\n```\n\n## Practical Example: Named Entity Recognition\n\n```python\nfrom transformers import pipeline\n\nner = pipeline(\"ner\")\n\ntext = \"Apple Inc. was founded by Steve Jobs in Cupertino, California.\"\nentities = ner(text)\n\nfor entity in entities:\n    print(f\"{entity['word']}: {entity['entity']}\")\n```\n\n## Text Classification\n\n```python\nfrom transformers import pipeline\n\nclassifier = pipeline(\"zero-shot-classification\")\n\ntext = \"The film was amazing\"\ncandidate_labels = [\"positive\", \"negative\", \"neutral\"]\n\nresult = classifier(text, candidate_labels)\nprint(result)\n# {'sequence': ..., 'labels': ['positive', 'neutral', 'negative'], \n#  'scores': [0.97, 0.02, 0.01]}\n```\n\n## Summary\n\nNLP processes text through tokenization and representation. Bag-of-words and TF-IDF provide simple representations. Word embeddings (Word2Vec, GloVe) capture semantic meaning in dense vectors. Transformers revolutionized NLP through self-attention mechanism. BERT provides bidirectional pre-trained representations. GPT enables text generation. Attention mechanisms weight importance of different words. Pre-trained models from libraries like Hugging Face enable practical NLP tasks from classification to translation.",
+  "quiz": [
+    {
+      "question": "What is tokenization in NLP?",
+      "options": ["A. Converting text to lowercase", "B. Breaking text into individual tokens (words, subwords)", "C. Removing punctuation", "D. Counting word frequency"],
+      "correct": 1
+    },
+    {
+      "question": "What is the main benefit of word embeddings over bag-of-words?",
+      "options": ["A. Smaller file size", "B. Captures semantic meaning in continuous space", "C. Faster training", "D. No preprocessing needed"],
+      "correct": 1
+    },
+    {
+      "question": "What is the key innovation of the Transformer architecture?",
+      "options": ["A. Recurrent connections", "B. Self-attention mechanism", "C. Convolutional layers", "D. Dropout regularization"],
+      "correct": 1
+    },
+    {
+      "question": "What is the difference between BERT and GPT?",
+      "options": ["A. BERT is faster", "B. BERT is bidirectional, GPT is unidirectional", "C. GPT is for classification only", "D. No significant difference"],
+      "correct": 1
+    }
+  ],
+  "flashcards": [
+    {
+      "front": "What is the purpose of tokenization in NLP?",
+      "back": "Tokenization breaks raw text into meaningful units (words, subwords, or characters) that can be processed by NLP models. It's the first preprocessing step that converts continuous text into discrete, analyzable elements."
+    },
+    {
+      "front": "What are N-grams and how are they used in language modeling?",
+      "back": "N-grams are sequences of n consecutive tokens. Bigrams (n=2) are pairs, trigrams (n=3) are triplets. N-gram language models predict the next word based on previous n-1 words, useful for simple baseline models."
+    },
+    {
+      "front": "How does TF-IDF weight words differently from bag-of-words?",
+      "back": "Bag-of-words counts word frequencies equally. TF-IDF weights words by importance: TF-IDF = TF * IDF where IDF = log(N / num_docs_with_term). Common words across documents get low weights, unique/meaningful words get high weights."
+    },
+    {
+      "front": "What makes Word2Vec embeddings effective?",
+      "back": "Word2Vec learns dense word vectors through skip-gram (predicting context from target) or CBOW (predicting target from context). Similar words end up close in embedding space, and vector arithmetic captures semantic relationships (e.g., king - man + woman ≈ queen)."
+    },
+    {
+      "front": "What is the self-attention mechanism in Transformers?",
+      "back": "Self-attention computes a weighted sum of values based on query-key similarity: Attention(Q,K,V) = softmax(QK^T/√d)V. Each position attends to all other positions, allowing the model to capture long-range dependencies efficiently."
+    },
+    {
+      "front": "How does BERT pre-training differ from GPT?",
+      "back": "BERT uses bidirectional pre-training with masked language modeling (masking random words and predicting them). GPT uses unidirectional pre-training predicting next tokens. BERT is better for understanding/classification, GPT is better for generation."
+    },
+    {
+      "front": "What are the main tasks BERT can be fine-tuned for?",
+      "back": "Classification (sentiment analysis, topic classification), question answering, named entity recognition, and semantic similarity. BERT's bidirectional representations transfer well to many downstream NLP tasks."
+    },
+    {
+      "front": "What does an attention head in a multi-head attention layer do?",
+      "back": "Each attention head learns a different way to relate positions to each other through different Q, K, V projections. Multi-head attention concatenates outputs from all heads, allowing the model to attend to different semantic subspaces simultaneously."
+    }
+  ],
+  "summary": "Week 6 covered Natural Language Processing for understanding language. Tokenization breaks text into tokens. Bag-of-words and TF-IDF provide simple representations. Word embeddings (Word2Vec, GloVe) capture semantic meaning. Transformers use self-attention for powerful representations. BERT provides bidirectional pre-training. GPT enables text generation. These techniques power applications from sentiment analysis to machine translation to dialogue systems."
+}

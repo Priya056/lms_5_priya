@@ -1,0 +1,8 @@
+[
+  {"front": "How do you open and read a file?", "back": "with open('filename', 'r') as file: content = file.read()"},
+  {"front": "What are the file modes?", "back": "'r' (read), 'w' (write/overwrite), 'a' (append), 'x' (create)."},
+  {"front": "Why use 'with' statement for files?", "back": "Automatically closes the file even if an error occurs, ensuring proper resource cleanup."},
+  {"front": "What is csv module used for?", "back": "Reading and writing comma-separated values files with csv.reader and csv.writer."},
+  {"front": "What does csv.DictReader return?", "back": "Each row as a dictionary where keys are column names from the header row."},
+  {"front": "What methods read file contents?", "back": "read() (entire file), readline() (one line), readlines() (all lines as list)."}
+]

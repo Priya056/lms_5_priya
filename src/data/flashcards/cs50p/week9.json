@@ -1,0 +1,8 @@
+[
+  {"front": "What is a set?", "back": "An unordered collection of unique elements enclosed in curly braces {item1, item2, ...}."},
+  {"front": "What is a frozenset?", "back": "An immutable set that cannot be modified after creation."},
+  {"front": "What is a list comprehension?", "back": "[expression for item in iterable] - concise syntax for creating lists from transformations."},
+  {"front": "What is a lambda function?", "back": "An anonymous one-line function defined as lambda args: expression."},
+  {"front": "What are type hints?", "back": "Annotations showing expected types (def func(x: int) -> str:) for documentation and tooling."},
+  {"front": "What is docstring?", "back": "A string at the start of a module/function/class describing its purpose and usage."}
+]

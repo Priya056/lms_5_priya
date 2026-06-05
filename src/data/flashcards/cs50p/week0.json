@@ -1,0 +1,8 @@
+[
+  {"front": "What is a function in Python?", "back": "A reusable block of code that performs a specific task, defined with 'def' keyword and called by name."},
+  {"front": "How do you define a function with arguments?", "back": "def function_name(arg1, arg2): where arguments are parameters the function accepts."},
+  {"front": "What does 'return' do in a function?", "back": "Sends a value back to the caller and stops the function execution immediately."},
+  {"front": "What is a variable?", "back": "A container for storing data values that can be assigned, modified, and reused throughout a program."},
+  {"front": "Name the four basic data types in Python.", "back": "str (string), int (integer), float (decimal), bool (boolean)."},
+  {"front": "What does input() return?", "back": "Always returns a string, even if the user enters numbers."}
+]

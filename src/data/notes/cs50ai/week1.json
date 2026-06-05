@@ -1,0 +1,62 @@
+{
+  "title": "Week 1 — Knowledge",
+  "source": "CS50 AI 2024 — Lecture 1",
+  "content": "# Knowledge Representation and Reasoning\n\n## Introduction to Logic\n\nKnowledge representation enables machines to represent facts about the world and reason about them. Propositional logic provides a formal system for representing and manipulating knowledge.\n\n## Propositional Logic\n\nPropositions are statements that are either true or false.\n\n### Basic Propositions\n\n```\nP: \"It is raining\"\nQ: \"The ground is wet\"\n```\n\n### Logical Operators\n\n**Conjunction (AND, ∧)**\n- P ∧ Q: \"It is raining AND the ground is wet\"\n- True only if both are true\n\n**Disjunction (OR, ∨)**\n- P ∨ Q: \"It is raining OR the ground is wet\"\n- True if at least one is true\n\n**Negation (NOT, ¬)**\n- ¬P: \"It is NOT raining\"\n- Reverses truth value\n\n**Implication (→)**\n- P → Q: \"If it is raining, then the ground is wet\"\n- False only when P is true and Q is false\n\n**Biconditional (↔)**\n- P ↔ Q: \"It is raining if and only if the ground is wet\"\n- True when both have same truth value\n\n## Models and Satisfiability\n\nA model assigns truth values to propositions. A formula is:\n- **Satisfiable**: True in at least one model\n- **Unsatisfiable**: False in all models\n- **Valid**: True in all models\n\n## Inference and Entailment\n\nA knowledge base (KB) entails a proposition (α) if α is true in all models where KB is true.\n\n```\nKB ⊨ α (KB entails alpha)\n```\n\n### Model Checking\n\nDetermine if KB entails α by checking all models:\n\n```python\ndef model_checking(kb, alpha):\n    \"\"\"Check if KB entails alpha.\"\"\"\n    for model in all_models:\n        if evaluate(kb, model):\n            if not evaluate(alpha, model):\n                return False  # Counterexample found\n    return True\n```\n\n## Inference Rules\n\nInference rules derive new facts from existing knowledge.\n\n### Modus Ponens\n\nFrom P → Q and P, infer Q:\n\n```\nP → Q\nP\n-------\nQ\n```\n\nExample:\n```\n\"If it rains, the ground is wet\" → \"The ground is wet\"\n\"It rains\"\n---------\n\"The ground is wet\"\n```\n\n### Universal Instantiation\n\nFrom ∀x P(x), infer P(a) for any specific object a.\n\n## Conjunctive Normal Form (CNF)\n\nCNF is a standard form where formulas are conjunctions of disjunctive clauses:\n\n```\n(P₁ ∨ P₂ ∨ ¬P₃) ∧ (P₄ ∨ ¬P₅) ∧ (P₆)\n```\n\nEach clause is a disjunction (OR) of literals, and clauses are connected by conjunction (AND).\n\nConvert any formula to CNF:\n\n```python\ndef to_cnf(formula):\n    \"\"\"Convert formula to CNF.\"\"\"\n    # 1. Eliminate biconditionals: P ↔ Q becomes (P → Q) ∧ (Q → P)\n    # 2. Eliminate implications: P → Q becomes ¬P ∨ Q\n    # 3. Move negations inward (De Morgan's laws)\n    # 4. Distribute OR over AND\n    pass\n```\n\n## Resolution\n\nResolution is an inference rule for CNF formulas:\n\nFrom clauses (P ∨ α) and (¬P ∨ β), infer (α ∨ β).\n\nExample:\n```\n(Vampire ∨ Ghost) and (¬Vampire ∨ Werewolf)\n-------\n(Ghost ∨ Werewolf)\n```\n\n## DPLL Algorithm\n\nDPLL (Davis-Putnam-Logemann-Loveland) checks CNF satisfiability:\n\n```python\ndef dpll(clauses, assignments={}):\n    \"\"\"DPLL satisfiability algorithm.\"\"\"\n    # All clauses satisfied\n    if all_satisfied(clauses, assignments):\n        return assignments\n    \n    # Empty clause (unsatisfiable)\n    if has_empty_clause(clauses, assignments):\n        return None\n    \n    # Unit propagation: single literal clauses\n    for literal in unit_clauses(clauses):\n        return dpll(clauses, {**assignments, literal: True})\n    \n    # Pure literal elimination\n    for literal in pure_literals(clauses):\n        return dpll(clauses, {**assignments, literal: True})\n    \n    # Choose literal and try both assignments\n    literal = choose_literal(clauses)\n    \n    # Try true\n    result = dpll(clauses, {**assignments, literal: True})\n    if result is not None:\n        return result\n    \n    # Try false\n    return dpll(clauses, {**assignments, literal: False})\n```\n\n## Knowledge Bases\n\nA knowledge base stores facts and rules:\n\n```python\nclass KnowledgeBase:\n    def __init__(self):\n        self.facts = set()\n        self.rules = []\n    \n    def tell(self, fact):\n        \"\"\"Add fact to KB.\"\"\"\n        self.facts.add(fact)\n    \n    def add_rule(self, premise, conclusion):\n        \"\"\"Add rule: if premise then conclusion.\"\"\"\n        self.rules.append((premise, conclusion))\n    \n    def ask(self, query):\n        \"\"\"Query KB using forward chaining.\"\"\"\n        # Check if query is in facts\n        if query in self.facts:\n            return True\n        \n        # Try to derive query from rules\n        for premise, conclusion in self.rules:\n            if conclusion == query and self.ask(premise):\n                return True\n        \n        return False\n```\n\n## Practical Example: Puzzle Solving\n\n```python\ndef solve_puzzle():\n    \"\"\"\n    There are three people: Alice, Bob, Charlie.\n    Exactly one is a knight (always truthful),\n    exactly one is a knave (always lies),\n    exactly one is a normal person (random truth values).\n    \n    Alice says: \"Bob is a knight.\"\n    Bob says: \"I am normal.\"\n    Charlie says: \"Alice is a knave.\"\n    \n    Who is who?\n    \"\"\"\n    from itertools import permutations\n    \n    roles = [\"Knight\", \"Knave\", \"Normal\"]\n    people = [\"Alice\", \"Bob\", \"Charlie\"]\n    \n    for perm in permutations(roles):\n        assignment = dict(zip(people, perm))\n        \n        # Check consistency of statements\n        alice_statement = assignment[\"Bob\"] == \"Knight\"\n        bob_statement = assignment[\"Bob\"] == \"Normal\"\n        charlie_statement = assignment[\"Alice\"] == \"Knave\"\n        \n        if is_consistent(assignment, alice_statement, bob_statement, charlie_statement):\n            return assignment\n    \n    return None\n```\n\n## Summary\n\nKnowledge representation uses propositional and predicate logic to formalize facts and rules. Model checking verifies inference by examining truth assignments. Inference rules like modus ponens derive new knowledge. CNF provides standard form for automated reasoning. Resolution is a powerful inference rule for CNF. DPLL efficiently checks satisfiability using unit propagation and pure literal elimination. Knowledge bases implement forward and backward chaining for query answering.",
+  "quiz": [
+    {
+      "question": "What does it mean for a KB to entail a proposition?",
+      "options": ["A. The KB contains the proposition", "B. The proposition is true in all models where KB is true", "C. The proposition contradicts the KB", "D. The proposition is a rule in the KB"],
+      "correct": 1
+    },
+    {
+      "question": "What is the result of: 'If it rains, the ground is wet' AND 'It rains'?",
+      "options": ["A. It doesn't rain", "B. The ground is not wet", "C. The ground is wet", "D. Undetermined"],
+      "correct": 2
+    },
+    {
+      "question": "What is the standard form for automated reasoning in logic?",
+      "options": ["A. Disjunctive Normal Form", "B. Conjunctive Normal Form", "C. Negation Normal Form", "D. Predicate Normal Form"],
+      "correct": 1
+    },
+    {
+      "question": "What technique does DPLL use to simplify satisfiability checking?",
+      "options": ["A. Model enumeration", "B. Unit propagation and pure literal elimination", "C. Random search", "D. Depth-first traversal"],
+      "correct": 1
+    }
+  ],
+  "flashcards": [
+    {
+      "front": "What are the five logical operators in propositional logic?",
+      "back": "Conjunction (AND, ∧), Disjunction (OR, ∨), Negation (NOT, ¬), Implication (→), and Biconditional (↔). These operators combine propositions to form complex logical statements."
+    },
+    {
+      "front": "What is the difference between satisfiable and valid formulas?",
+      "back": "A formula is satisfiable if it's true in at least one model, and valid if it's true in all models. Valid formulas are always satisfiable, but satisfiable formulas may not be valid."
+    },
+    {
+      "front": "What is modus ponens and why is it important?",
+      "back": "Modus ponens states: from P → Q and P, we can infer Q. It's a fundamental inference rule that allows us to derive new knowledge from existing facts and rules in a knowledge base."
+    },
+    {
+      "front": "Why is Conjunctive Normal Form (CNF) important for automated reasoning?",
+      "back": "CNF is a standard form where formulas are conjunctions of disjunctions. It enables efficient automated reasoning algorithms like resolution and DPLL to check satisfiability and perform inference."
+    },
+    {
+      "front": "How does the resolution rule work?",
+      "back": "Resolution: from (P ∨ α) and (¬P ∨ β), infer (α ∨ β). This rule eliminates a variable P from two clauses. Resolution is complete for refutation, meaning it can prove any valid formula by finding a contradiction."
+    },
+    {
+      "front": "What is unit propagation in the DPLL algorithm?",
+      "back": "Unit propagation identifies clauses with only one unassigned literal (unit clauses) and immediately assigns that literal to satisfy the clause. This simplification reduces the search space significantly."
+    },
+    {
+      "front": "How does a knowledge base help with reasoning?",
+      "back": "A knowledge base stores facts and rules, allowing systems to ask queries and derive answers. It can use forward chaining (deriving conclusions from facts) or backward chaining (working backward from goals) to answer questions."
+    },
+    {
+      "front": "What is the difference between first-order logic and propositional logic?",
+      "back": "First-order logic extends propositional logic with quantifiers (∀ and ∃) and predicates, allowing reasoning about objects and their properties. Propositional logic only deals with true/false propositions."
+    }
+  ],
+  "summary": "Week 1 covered knowledge representation using propositional logic with operators (AND, OR, NOT, implication, biconditional). Model checking verifies KB entailment by examining truth assignments. Inference rules like modus ponens derive new knowledge. CNF provides standard form for automated reasoning. Resolution infers new clauses from CNF formulas. DPLL efficiently checks satisfiability using unit propagation and pure literal elimination. Knowledge bases implement query answering for logical inference."
+}

@@ -1,0 +1,8 @@
+[
+  {"front": "What is hill climbing?", "back": "Local search that always moves to steepest uphill neighbor, but can get stuck in local optima."},
+  {"front": "How does simulated annealing escape local optima?", "back": "Accepts worse solutions with probability that decreases over time (temperature)."},
+  {"front": "What is a Constraint Satisfaction Problem (CSP)?", "back": "Problem with variables, domains, and constraints requiring assignment satisfying all constraints."},
+  {"front": "What is arc consistency?", "back": "Property where for each value of one variable, there exists compatible value in another."},
+  {"front": "What does AC-3 algorithm do?", "back": "Enforces arc consistency in CSP by removing values from domains that have no valid partner."},
+  {"front": "What is MRV heuristic?", "back": "Selects variable with minimum remaining values (smallest domain) for backtracking search."}
+]
