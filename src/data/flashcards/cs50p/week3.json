@@ -1,0 +1,8 @@
+[
+  {"front": "What is an exception in Python?", "back": "An error that occurs during program execution that can be caught and handled gracefully."},
+  {"front": "What does try-except do?", "back": "try block contains code that might raise an exception, except block handles it if raised."},
+  {"front": "Name three common exception types.", "back": "ValueError (wrong value type), TypeError (wrong data type), ZeroDivisionError (divide by zero)."},
+  {"front": "What is the purpose of 'finally'?", "back": "A block that always executes regardless of whether an exception occurred, used for cleanup."},
+  {"front": "What does 'raise' do?", "back": "Manually raises an exception with raise Exception('message')."},
+  {"front": "What does the 'pass' statement do?", "back": "A placeholder that does nothing, used when no action is needed but syntax requires something."}
+]

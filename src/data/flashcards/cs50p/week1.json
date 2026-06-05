@@ -1,0 +1,8 @@
+[
+  {"front": "What is the difference between == and =?", "back": "== compares values (returns True/False), = assigns a value to a variable."},
+  {"front": "What comparison operators return True/False?", "back": "==, !=, <, >, <=, >= compare values and return boolean results."},
+  {"front": "What boolean operators combine conditions?", "back": "'and' (both must be true), 'or' (at least one true), 'not' (reverses value)."},
+  {"front": "What is the structure of an if-elif-else statement?", "back": "if condition1: ... elif condition2: ... else: ... Python checks top to bottom, stops at first True."},
+  {"front": "What values are 'falsy' in Python?", "back": "False, 0, empty string (\"\"), None, empty collections."},
+  {"front": "What is a match statement used for?", "back": "Pattern matching to handle multiple cases more cleanly than many if-elif statements."}
+]

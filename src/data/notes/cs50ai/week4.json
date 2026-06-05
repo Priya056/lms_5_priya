@@ -1,0 +1,62 @@
+{
+  "title": "Week 4 — Learning",
+  "source": "CS50 AI 2024 — Lecture 4",
+  "content": "# Learning: Machine Learning Fundamentals\n\n## Introduction\n\nMachine learning enables computers to learn patterns from data without explicit programming. Supervised learning trains on labeled data to predict outcomes for new inputs.\n\n## Supervised Learning\n\nSupervised learning maps inputs to labeled outputs using training data.\n\n### Regression\n\nPredicts continuous values:\n\n```python\nfrom sklearn.linear_model import LinearRegression\n\nX = [[1], [2], [3], [4], [5]]\ny = [2, 4, 5, 4, 5]\n\nmodel = LinearRegression()\nmodel.fit(X, y)\n\nprediction = model.predict([[6]])\nprint(prediction)  # [5.2]\n```\n\n### Classification\n\nPredicts categorical labels:\n\n```python\nfrom sklearn.tree import DecisionTreeClassifier\n\nX = [[1, 2], [2, 3], [3, 1], [4, 3]]\ny = [0, 0, 1, 1]\n\nmodel = DecisionTreeClassifier()\nmodel.fit(X, y)\n\nprediction = model.predict([[2, 2]])\nprint(prediction)  # [0]\n```\n\n## k-Nearest Neighbors (kNN)\n\nClassifies by majority vote of k nearest neighbors:\n\n```python\nfrom sklearn.neighbors import KNeighborsClassifier\n\nX_train = [[1, 2], [2, 3], [3, 1], [4, 3]]\ny_train = [0, 0, 1, 1]\n\nmodel = KNeighborsClassifier(n_neighbors=3)\nmodel.fit(X_train, y_train)\n\nX_test = [[2, 2]]\nprediction = model.predict(X_test)\nprint(prediction)  # Prediction based on 3 nearest neighbors\n```\n\n**Properties**:\n- Simple and intuitive\n- No training phase (lazy learner)\n- Can be slow for prediction\n- Sensitive to irrelevant features\n\n## Perceptron\n\nSimple linear classifier:\n\n```python\nfrom sklearn.linear_model import Perceptron\n\nX = [[1, 2], [2, 3], [3, 1], [4, 3]]\ny = [0, 0, 1, 1]\n\nmodel = Perceptron()\nmodel.fit(X, y)\n\nprediction = model.predict([[2, 2]])\nprint(prediction)\n```\n\nPerceptron algorithm:\n\n```python\ndef perceptron(X, y, epochs=100, learning_rate=0.1):\n    \"\"\"Simple perceptron learning algorithm.\"\"\"\n    weights = [0] * len(X[0])\n    bias = 0\n    \n    for epoch in range(epochs):\n        for x_i, y_i in zip(X, y):\n            # Prediction\n            prediction = sum(w * x for w, x in zip(weights, x_i)) + bias\n            prediction = 1 if prediction > 0 else 0\n            \n            # Update weights\n            error = y_i - prediction\n            for j in range(len(weights)):\n                weights[j] += learning_rate * error * x_i[j]\n            bias += learning_rate * error\n    \n    return weights, bias\n```\n\n## Support Vector Machines (SVM)\n\nFinds optimal separating hyperplane:\n\n```python\nfrom sklearn.svm import SVC\n\nX = [[1, 2], [2, 3], [3, 1], [4, 3]]\ny = [0, 0, 1, 1]\n\nmodel = SVC(kernel='linear')\nmodel.fit(X, y)\n\nprediction = model.predict([[2.5, 2.5]])\nprint(prediction)\n```\n\nKernels enable non-linear classification:\n- `linear`: Linear decision boundary\n- `poly`: Polynomial decision boundary\n- `rbf`: Radial basis function (complex boundaries)\n\n## Decision Trees\n\nHierarchical structure of decisions:\n\n```python\nfrom sklearn.tree import DecisionTreeClassifier\nfrom sklearn import tree\n\nX = [[1, 2], [2, 3], [3, 1], [4, 3]]\ny = [0, 0, 1, 1]\n\nmodel = DecisionTreeClassifier(max_depth=2)\nmodel.fit(X, y)\n\n# Visualize tree\ntree.plot_tree(model, feature_names=['X1', 'X2'])\n```\n\n**Properties**:\n- Interpretable and easy to understand\n- Can overfit easily\n- No input scaling needed\n\n## Overfitting and Regularization\n\nOverfitting occurs when model memorizes training data instead of learning patterns.\n\n### Regularization\n\nAdd penalty for complexity:\n\n```python\nfrom sklearn.linear_model import LogisticRegression\n\n# L2 regularization (Ridge)\nmodel = LogisticRegression(penalty='l2', C=1.0)\n\n# L1 regularization (Lasso)\nmodel = LogisticRegression(penalty='l1', solver='liblinear')\n\n# No regularization\nmodel = LogisticRegression(penalty=None)\n```\n\n### Cross-Validation\n\nEvaluate model on different data splits:\n\n```python\nfrom sklearn.model_selection import cross_val_score\nfrom sklearn.tree import DecisionTreeClassifier\n\nX = [[1, 2], [2, 3], [3, 1], [4, 3], [5, 2], [6, 1]]\ny = [0, 0, 1, 1, 0, 1]\n\nmodel = DecisionTreeClassifier()\nscores = cross_val_score(model, X, y, cv=3)  # 3-fold cross-validation\nprint(scores.mean())  # Average score\n```\n\nk-fold cross-validation:\n1. Divide data into k parts\n2. Train on k-1 parts, test on remaining\n3. Repeat k times\n4. Average results\n\n## Ensemble Methods\n\nCombine multiple models for better predictions.\n\n### Random Forest\n\nAverage predictions from multiple decision trees:\n\n```python\nfrom sklearn.ensemble import RandomForestClassifier\n\nX = [[1, 2], [2, 3], [3, 1], [4, 3]]\ny = [0, 0, 1, 1]\n\nmodel = RandomForestClassifier(n_estimators=10)\nmodel.fit(X, y)\n\nprediction = model.predict([[2.5, 2.5]])\nprint(prediction)\n```\n\n### Gradient Boosting\n\nSequentially build trees to correct previous errors:\n\n```python\nfrom sklearn.ensemble import GradientBoostingClassifier\n\nX = [[1, 2], [2, 3], [3, 1], [4, 3]]\ny = [0, 0, 1, 1]\n\nmodel = GradientBoostingClassifier(n_estimators=100)\nmodel.fit(X, y)\n\nprediction = model.predict([[2.5, 2.5]])\nprint(prediction)\n```\n\n## Practical Example: Iris Classification\n\n```python\nfrom sklearn.datasets import load_iris\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.ensemble import RandomForestClassifier\nfrom sklearn.metrics import accuracy_score, confusion_matrix\n\n# Load data\niris = load_iris()\nX = iris.data\ny = iris.target\n\n# Split data\nX_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)\n\n# Train model\nmodel = RandomForestClassifier(n_estimators=10, random_state=42)\nmodel.fit(X_train, y_train)\n\n# Evaluate\ny_pred = model.predict(X_test)\naccuracy = accuracy_score(y_test, y_pred)\nprint(f\"Accuracy: {accuracy:.2%}\")\n\n# Feature importance\nfor i, importance in enumerate(model.feature_importances_):\n    print(f\"{iris.feature_names[i]}: {importance:.4f}\")\n```\n\n## Evaluation Metrics\n\n### Accuracy\nProportion of correct predictions:\n\n```\nAccuracy = (TP + TN) / (TP + TN + FP + FN)\n```\n\n### Precision and Recall\n\n```\nPrecision = TP / (TP + FP)  # Of predictions correct?\nRecall = TP / (TP + FN)     # Of actual correct found?\n```\n\n### F1 Score\nHarmonic mean of precision and recall:\n\n```\nF1 = 2 * (Precision * Recall) / (Precision + Recall)\n```\n\n## Summary\n\nSupervised learning trains on labeled data to predict new examples. Regression predicts continuous values, classification predicts categories. kNN classifies by neighbor voting. Perceptron performs linear classification. SVM finds optimal separating hyperplanes. Decision trees create interpretable models. Overfitting occurs when models memorize rather than generalize; cross-validation and regularization prevent this. Ensemble methods combine multiple models for better predictions. Proper evaluation using accuracy, precision, recall, and F1 score ensures model reliability.",
+  "quiz": [
+    {
+      "question": "What is the main difference between regression and classification?",
+      "options": ["A. Regression uses numbers, classification uses text", "B. Regression predicts continuous values, classification predicts categories", "C. Regression is faster than classification", "D. They are equivalent"],
+      "correct": 1
+    },
+    {
+      "question": "How does k-Nearest Neighbors classify new data?",
+      "options": ["A. Calculates distance to all points", "B. Uses k nearest neighbors' majority vote", "C. Finds average of k nearest", "D. Uses weighted sum"],
+      "correct": 1
+    },
+    {
+      "question": "What is overfitting?",
+      "options": ["A. Model fits perfectly", "B. Model memorizes training data instead of learning patterns", "C. Model is too simple", "D. Model uses wrong features"],
+      "correct": 1
+    },
+    {
+      "question": "What does cross-validation do?",
+      "options": ["A. Trains multiple models", "B. Validates on different data splits", "C. Increases training accuracy", "D. Compares model types"],
+      "correct": 1
+    }
+  ],
+  "flashcards": [
+    {
+      "front": "What is supervised learning?",
+      "back": "Supervised learning trains on labeled data to learn the mapping from inputs to outputs. Each training example has features (X) and a target label (y). The model learns to predict labels for new, unseen inputs."
+    },
+    {
+      "front": "How does k-Nearest Neighbors (kNN) work?",
+      "back": "kNN classifies new data by finding the k nearest neighbors in the training set (using distance metrics) and using their majority vote. It's a lazy learner with no training phase, but prediction can be slow and it's sensitive to irrelevant features."
+    },
+    {
+      "front": "What is the difference between precision and recall?",
+      "back": "Precision = TP/(TP+FP) answers 'of predicted positives, how many are correct?' Recall = TP/(TP+FN) answers 'of actual positives, how many did we find?' High precision means few false positives, high recall means few false negatives."
+    },
+    {
+      "front": "What problem does regularization solve?",
+      "back": "Regularization prevents overfitting by adding a penalty term for model complexity to the loss function. L1 (Lasso) and L2 (Ridge) regularization constrain weights, forcing simpler models that generalize better to unseen data."
+    },
+    {
+      "front": "How does k-fold cross-validation work?",
+      "back": "Divide data into k parts. Train on k-1 parts and test on the remaining part. Repeat k times with different test folds. Average the k performance scores to get an estimate of model performance. This uses all data for both training and testing."
+    },
+    {
+      "front": "What are decision trees and how do they work?",
+      "back": "Decision trees recursively partition the data by asking yes/no questions about features. Each internal node is a decision, edges are outcomes, and leaves are predictions. They're interpretable but prone to overfitting on noisy data."
+    },
+    {
+      "front": "How do ensemble methods like Random Forest improve performance?",
+      "back": "Random Forest trains multiple decision trees on different random subsets of data and features, then averages their predictions. This reduces overfitting and variance compared to a single decision tree."
+    },
+    {
+      "front": "What is the F1 score and when is it useful?",
+      "back": "F1 = 2 * (Precision * Recall) / (Precision + Recall) is the harmonic mean of precision and recall. It's useful when you need a single metric balancing both false positives and false negatives, especially with imbalanced datasets."
+    }
+  ],
+  "summary": "Week 4 introduced supervised learning for predicting labeled outcomes. Regression predicts continuous values while classification predicts categories. kNN classifies by neighbor voting, perceptron performs linear classification, SVM finds optimal hyperplanes, and decision trees create interpretable hierarchies. Overfitting occurs when models memorize data; cross-validation and regularization prevent this. Ensemble methods (random forest, gradient boosting) combine multiple models for better predictions. Proper evaluation using accuracy, precision, recall, and F1 score ensures reliability."
+}

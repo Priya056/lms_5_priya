@@ -1,0 +1,62 @@
+{
+  "title": "Week 5 — Neural Networks",
+  "source": "CS50 AI 2024 — Lecture 5",
+  "content": "# Neural Networks: Deep Learning Foundations\n\n## Introduction\n\nNeural networks are inspired by biological neurons and can learn complex non-linear relationships. Deep learning uses multiple layers to extract hierarchical features.\n\n## Artificial Neurons\n\nAn artificial neuron performs a weighted sum followed by non-linearity:\n\n```\nz = w₁x₁ + w₂x₂ + ... + wₙxₙ + b\na = σ(z)\n```\n\nWhere w are weights, b is bias, and σ is activation function.\n\n## Activation Functions\n\n### Sigmoid\n\nSquashes output to (0, 1):\n\n```\nσ(z) = 1 / (1 + e^(-z))\n```\n\n### ReLU (Rectified Linear Unit)\n\nIdentity for positive values, zero for negative:\n\n```\nReLU(z) = max(0, z)\n```\n\nMost popular in hidden layers.\n\n### Tanh\n\nSquashes output to (-1, 1):\n\n```\ntanh(z) = (e^z - e^(-z)) / (e^z + e^(-z))\n```\n\n### Softmax\n\nFor multi-class output, converts to probability distribution:\n\n```\nsoftmax(z)ᵢ = e^zᵢ / Σⱼ e^zⱼ\n```\n\n## Neural Network Architecture\n\n```python\nfrom tensorflow import keras\nfrom tensorflow.keras import layers\n\n# Create sequential model\nmodel = keras.Sequential([\n    layers.Input(shape=(784,)),  # Input layer\n    layers.Dense(128, activation='relu'),  # Hidden layer 1\n    layers.Dense(64, activation='relu'),   # Hidden layer 2\n    layers.Dense(10, activation='softmax') # Output layer (10 classes)\n])\n```\n\nLayers transform inputs through learned weights and biases.\n\n## Backpropagation\n\nBackpropagation computes gradients of loss with respect to weights:\n\n```python\ndef backpropagation(network, x, y, learning_rate=0.1):\n    \"\"\"Simplified backpropagation.\"\"\"\n    # Forward pass\n    activations = [x]\n    z_values = []\n    \n    for layer in network:\n        z = layer.compute_z(activations[-1])\n        a = layer.activation(z)\n        z_values.append(z)\n        activations.append(a)\n    \n    # Backward pass\n    delta = compute_output_delta(activations[-1], y, z_values[-1])\n    \n    for i in range(len(network) - 1, 0, -1):\n        delta = network[i].weight.T @ delta * network[i-1].activation_derivative(z_values[i-1])\n        network[i].weight -= learning_rate * delta @ activations[i-1].T\n        network[i].bias -= learning_rate * delta\n```\n\n## Gradient Descent\n\nIteratively update weights in direction of steepest descent:\n\n```python\n# Batch gradient descent (all data)\nfor epoch in range(epochs):\n    predictions = model.predict(X)\n    gradients = compute_gradients(predictions, y)\n    weights -= learning_rate * gradients\n\n# Stochastic gradient descent (one sample)\nfor epoch in range(epochs):\n    for x_i, y_i in zip(X, y):\n        prediction = model.predict(x_i)\n        gradients = compute_gradients(prediction, y_i)\n        weights -= learning_rate * gradients\n\n# Mini-batch gradient descent (compromise)\nfor epoch in range(epochs):\n    for batch in create_minibatches(X, y, batch_size=32):\n        predictions = model.predict(batch.X)\n        gradients = compute_gradients(predictions, batch.y)\n        weights -= learning_rate * gradients\n```\n\n## Deep Neural Networks\n\nMultiple hidden layers enable learning complex patterns:\n\n```python\nfrom tensorflow.keras import Sequential\nfrom tensorflow.keras.layers import Dense, Dropout\n\nmodel = Sequential([\n    Dense(256, activation='relu', input_shape=(784,)),\n    Dropout(0.2),  # Regularization\n    Dense(128, activation='relu'),\n    Dropout(0.2),\n    Dense(64, activation='relu'),\n    Dense(10, activation='softmax')\n])\n\nmodel.compile(\n    optimizer='adam',\n    loss='categorical_crossentropy',\n    metrics=['accuracy']\n)\n\nmodel.fit(X_train, y_train, epochs=20, batch_size=128, validation_split=0.1)\n```\n\n## Convolutional Neural Networks (CNN)\n\nCNNs excel at image processing through local connections and shared weights:\n\n```python\nfrom tensorflow.keras import Sequential\nfrom tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense\n\nmodel = Sequential([\n    Conv2D(32, (3, 3), activation='relu', input_shape=(28, 28, 1)),\n    MaxPooling2D((2, 2)),\n    Conv2D(64, (3, 3), activation='relu'),\n    MaxPooling2D((2, 2)),\n    Conv2D(64, (3, 3), activation='relu'),\n    Flatten(),\n    Dense(64, activation='relu'),\n    Dense(10, activation='softmax')\n])\n\nmodel.compile(\n    optimizer='adam',\n    loss='sparse_categorical_crossentropy',\n    metrics=['accuracy']\n)\n```\n\n### Convolutional Layers\n\nApply filters across input to detect features:\n\n```\nOutput size = (Input - Filter + 2*Padding) / Stride + 1\n```\n\n### Pooling Layers\n\nReduce spatial dimensions:\n\n```python\n# Max pooling: take maximum\n# Average pooling: take average\nMaxPooling2D((2, 2))  # 2x2 pool, stride 2\n```\n\n## Recurrent Neural Networks (RNN)\n\nRNNs process sequences by maintaining state:\n\n```python\nfrom tensorflow.keras import Sequential\nfrom tensorflow.keras.layers import LSTM, Dense\n\nmodel = Sequential([\n    LSTM(128, return_sequences=True, input_shape=(sequence_length, feature_dim)),\n    LSTM(64),\n    Dense(32, activation='relu'),\n    Dense(1)  # Prediction\n])\n```\n\n### Long Short-Term Memory (LSTM)\n\nLSTMs overcome vanishing gradient problem:\n\n```\nForget gate: fₜ = σ(Wf·[hₜ₋₁, xₜ] + bf)\nInput gate: iₜ = σ(Wᵢ·[hₜ₋₁, xₜ] + bᵢ)\nCandidate: C̃ₜ = tanh(Wc·[hₜ₋₁, xₜ] + bc)\nCell state: Cₜ = fₜ * Cₜ₋₁ + iₜ * C̃ₜ\nOutput gate: oₜ = σ(Wₒ·[hₜ₋₁, xₜ] + bₒ)\nHidden: hₜ = oₜ * tanh(Cₜ)\n```\n\n## Loss Functions\n\n### Mean Squared Error (Regression)\n\n```\nMSE = (1/n) * Σ(yᵢ - ŷᵢ)²\n```\n\n### Cross-Entropy (Classification)\n\n```\nCE = -Σᵢ yᵢ * log(ŷᵢ)\n```\n\n## Regularization Techniques\n\n### Dropout\n\nRandomly deactivate neurons during training:\n\n```python\nfrom tensorflow.keras.layers import Dropout\n\nmodel = Sequential([\n    Dense(128, activation='relu'),\n    Dropout(0.5),  # 50% dropout\n    Dense(64, activation='relu'),\n    Dropout(0.5),\n    Dense(10, activation='softmax')\n])\n```\n\n### Early Stopping\n\nStop training when validation loss stops improving:\n\n```python\nfrom tensorflow.keras.callbacks import EarlyStopping\n\ncallback = EarlyStopping(monitor='val_loss', patience=5)\nmodel.fit(X_train, y_train, epochs=100, callbacks=[callback], validation_split=0.2)\n```\n\n## Practical Example: MNIST Classification\n\n```python\nimport tensorflow as tf\nfrom tensorflow.keras import Sequential\nfrom tensorflow.keras.layers import Dense, Flatten, Dropout\n\n# Load data\n(X_train, y_train), (X_test, y_test) = tf.keras.datasets.mnist.load_data()\nX_train = X_train.astype('float32') / 255\nX_test = X_test.astype('float32') / 255\n\ny_train = tf.keras.utils.to_categorical(y_train, 10)\ny_test = tf.keras.utils.to_categorical(y_test, 10)\n\n# Build model\nmodel = Sequential([\n    Flatten(input_shape=(28, 28)),\n    Dense(512, activation='relu'),\n    Dropout(0.2),\n    Dense(256, activation='relu'),\n    Dropout(0.2),\n    Dense(10, activation='softmax')\n])\n\nmodel.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])\n\n# Train\nmodel.fit(X_train, y_train, epochs=10, batch_size=128, validation_split=0.1)\n\n# Evaluate\naccuracy = model.evaluate(X_test, y_test)[1]\nprint(f\"Test Accuracy: {accuracy:.4f}\")\n```\n\n## Summary\n\nNeural networks combine weighted inputs with non-linear activations. Backpropagation computes gradients for learning. Gradient descent updates weights iteratively. CNNs excel at image processing through convolution and pooling. RNNs process sequences maintaining state, with LSTMs overcoming vanishing gradients. Proper loss functions, regularization (dropout, early stopping), and architecture design enable effective deep learning. Understanding these fundamentals is essential for modern AI applications.",
+  "quiz": [
+    {
+      "question": "What does a ReLU activation function do?",
+      "options": ["A. Squashes to (0, 1)", "B. Returns max(0, z)", "C. Applies sigmoid", "D. Normalizes input"],
+      "correct": 1
+    },
+    {
+      "question": "What is backpropagation?",
+      "options": ["A. Forward pass through network", "B. Computing gradients of loss with respect to weights", "C. Training data preprocessing", "D. Model validation"],
+      "correct": 1
+    },
+    {
+      "question": "What is the purpose of dropout in neural networks?",
+      "options": ["A. Remove layers", "B. Randomly deactivate neurons to prevent overfitting", "C. Increase learning rate", "D. Speed up training"],
+      "correct": 1
+    },
+    {
+      "question": "What is an LSTM layer used for?",
+      "options": ["A. Image processing", "B. Processing sequences while addressing vanishing gradients", "C. Classification only", "D. Dimensionality reduction"],
+      "correct": 1
+    }
+  ],
+  "flashcards": [
+    {
+      "front": "What is the purpose of activation functions in neural networks?",
+      "back": "Activation functions introduce non-linearity into neural networks, allowing them to learn complex patterns. Without activation functions, stacking layers would be equivalent to a single linear transformation. ReLU, sigmoid, and tanh are common choices."
+    },
+    {
+      "front": "How does backpropagation compute gradients?",
+      "back": "Backpropagation uses the chain rule to compute gradients of the loss with respect to each weight, propagating errors backward through the network. It calculates ∂L/∂w for each weight by composing partial derivatives from the output layer back to input."
+    },
+    {
+      "front": "What are the three main variants of gradient descent?",
+      "back": "Batch gradient descent uses all data to compute gradients (slow but stable). Stochastic gradient descent uses one sample per update (fast but noisy). Mini-batch gradient descent uses small batches (balance between speed and stability)."
+    },
+    {
+      "front": "How do Convolutional Neural Networks (CNNs) excel at image processing?",
+      "back": "CNNs use convolutional layers with learned filters to detect local patterns, shared weights reduce parameters, and pooling layers reduce spatial dimensions. This architecture is efficient for images and captures hierarchical visual features."
+    },
+    {
+      "front": "What problem do LSTM cells solve in RNNs?",
+      "back": "LSTM cells solve the vanishing gradient problem in standard RNNs through gates (forget, input, output) that control information flow. The cell state acts as a memory, allowing gradients to flow over longer sequences without vanishing."
+    },
+    {
+      "front": "What does dropout regularization do and why?",
+      "back": "Dropout randomly deactivates neurons with probability p during training, forcing the network to learn redundant representations. This prevents co-adaptation and acts as an ensemble method, reducing overfitting significantly."
+    },
+    {
+      "front": "What is the difference between cross-entropy and mean squared error loss?",
+      "back": "MSE is for regression tasks, measuring squared differences: (1/n)Σ(yi - ŷi)². Cross-entropy is for classification, measuring probability distribution mismatch: -Σ yi log(ŷi). Cross-entropy typically works better for multi-class problems."
+    },
+    {
+      "front": "What does the softmax activation function do?",
+      "back": "Softmax converts raw output scores into a probability distribution over classes: softmax(zi) = e^zi / Σj e^zj. It ensures outputs sum to 1 and are between 0 and 1, making it ideal for multi-class classification output layers."
+    }
+  ],
+  "summary": "Week 5 covered neural networks for deep learning. Artificial neurons combine weighted inputs with activation functions. Backpropagation computes gradients for efficient learning. Gradient descent updates weights iteratively. CNNs use convolution and pooling for image processing. RNNs process sequences maintaining state, with LSTMs overcoming vanishing gradient problems. Regularization techniques (dropout, early stopping) prevent overfitting. Understanding architectures and training procedures enables building effective deep learning models."
+}

@@ -1,0 +1,8 @@
+[
+  {"front": "What is supervised learning?", "back": "Training on labeled data to learn mapping from inputs to outputs."},
+  {"front": "What is the difference between regression and classification?", "back": "Regression predicts continuous values, classification predicts discrete categories."},
+  {"front": "How does k-Nearest Neighbors work?", "back": "Classifies by majority vote of k nearest neighbors in training data."},
+  {"front": "What is overfitting?", "back": "Model memorizes training data instead of learning generalizable patterns, performs poorly on new data."},
+  {"front": "What is cross-validation?", "back": "Technique dividing data into k parts, training on k-1 parts, testing on remainder, repeated k times."},
+  {"front": "What is a random forest?", "back": "Ensemble method averaging predictions from multiple decision trees trained on random subsets."}
+]

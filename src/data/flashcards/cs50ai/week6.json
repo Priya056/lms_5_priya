@@ -1,0 +1,8 @@
+[
+  {"front": "What is tokenization in NLP?", "back": "Breaking text into individual tokens (words, subwords, or characters)."},
+  {"front": "What is TF-IDF?", "back": "Term Frequency-Inverse Document Frequency: weights words by importance in documents."},
+  {"front": "What are word embeddings?", "back": "Dense vectors representing words capturing semantic meaning (Word2Vec, GloVe)."},
+  {"front": "What is the Transformer architecture?", "back": "Uses self-attention mechanism to process sequences, parallelizable unlike RNNs."},
+  {"front": "What is BERT?", "back": "Bidirectional pre-trained transformer trained on masked language modeling and next sentence prediction."},
+  {"front": "What is self-attention?", "back": "Mechanism weighting importance of all positions in sequence relative to each position."}
+]

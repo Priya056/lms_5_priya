@@ -1,0 +1,8 @@
+[
+  {"front": "What is a module/library?", "back": "A collection of code written by others that you can import and use in your programs."},
+  {"front": "How do you import a module?", "back": "import module_name or from module_name import specific_item."},
+  {"front": "What is the random module used for?", "back": "Generating random numbers and performing random operations (randint, choice, shuffle)."},
+  {"front": "What is pip?", "back": "Python package installer used to download and install third-party libraries (pip install library_name)."},
+  {"front": "Name three modules in Python's standard library.", "back": "random, sys, statistics, datetime, csv, re (any three)."},
+  {"front": "What does 'from X import Y' do?", "back": "Imports only the specific item Y from module X, allowing you to use Y directly without X.Y."}
+]

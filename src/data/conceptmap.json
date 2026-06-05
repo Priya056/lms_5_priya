@@ -1,0 +1,53 @@
+{
+  "cs50p": {
+    "nodes": [
+      { "id": "w0", "label": "Functions & Variables", "weekNum": 0, "x": 300, "y": 80, "summary": "The foundation of Python programming. Learn to define functions, use variables, and understand basic data types." },
+      { "id": "w1", "label": "Conditionals", "weekNum": 1, "x": 180, "y": 200, "summary": "Control program flow with if/elif/else statements, boolean logic, and comparison operators." },
+      { "id": "w2", "label": "Loops", "weekNum": 2, "x": 420, "y": 200, "summary": "Repeat actions with while and for loops. Learn list iteration and control flow with break/continue." },
+      { "id": "w3", "label": "Exceptions", "weekNum": 3, "x": 120, "y": 340, "summary": "Handle errors gracefully with try/except blocks. Write robust programs that handle invalid input." },
+      { "id": "w4", "label": "Libraries", "weekNum": 4, "x": 300, "y": 340, "summary": "Leverage Python's vast ecosystem of standard library modules and third-party packages via pip." },
+      { "id": "w5", "label": "Unit Tests", "weekNum": 5, "x": 480, "y": 340, "summary": "Write automated tests with pytest to ensure your code works correctly and catch regressions." },
+      { "id": "w6", "label": "File I/O", "weekNum": 6, "x": 180, "y": 460, "summary": "Read and write files, work with CSV data, and persist information beyond program execution." },
+      { "id": "w7", "label": "Regular Expressions", "weekNum": 7, "x": 380, "y": 460, "summary": "Pattern-match strings using the re module. Extract data, validate input, and transform text." },
+      { "id": "w8", "label": "OOP", "weekNum": 8, "x": 260, "y": 580, "summary": "Model real-world concepts with classes and objects. Learn inheritance, properties, and design patterns." },
+      { "id": "w9", "label": "Et Cetera", "weekNum": 9, "x": 420, "y": 580, "summary": "Advanced Python features: sets, generators, list comprehensions, type hints, and more." }
+    ],
+    "edges": [
+      { "from": "w0", "to": "w1" },
+      { "from": "w0", "to": "w2" },
+      { "from": "w1", "to": "w3" },
+      { "from": "w2", "to": "w3" },
+      { "from": "w2", "to": "w4" },
+      { "from": "w3", "to": "w4" },
+      { "from": "w4", "to": "w5" },
+      { "from": "w4", "to": "w6" },
+      { "from": "w4", "to": "w7" },
+      { "from": "w5", "to": "w6" },
+      { "from": "w6", "to": "w8" },
+      { "from": "w7", "to": "w8" },
+      { "from": "w8", "to": "w9" }
+    ]
+  },
+  "cs50ai": {
+    "nodes": [
+      { "id": "w0", "label": "Search", "weekNum": 0, "x": 280, "y": 80, "summary": "Find solutions in state spaces using BFS, DFS, A*, and adversarial minimax search." },
+      { "id": "w1", "label": "Knowledge", "weekNum": 1, "x": 140, "y": 220, "summary": "Represent and reason about knowledge using propositional logic and inference algorithms." },
+      { "id": "w2", "label": "Uncertainty", "weekNum": 2, "x": 420, "y": 220, "summary": "Handle uncertainty with probability theory, Bayesian networks, and sampling methods." },
+      { "id": "w3", "label": "Optimization", "weekNum": 3, "x": 140, "y": 380, "summary": "Solve constraint satisfaction problems and find optimal solutions with local search." },
+      { "id": "w4", "label": "Learning", "weekNum": 4, "x": 380, "y": 380, "summary": "Learn patterns from data using supervised learning, k-NN, SVM, and reinforcement learning." },
+      { "id": "w5", "label": "Neural Networks", "weekNum": 5, "x": 260, "y": 500, "summary": "Build deep learning models with CNNs and backpropagation using TensorFlow." },
+      { "id": "w6", "label": "Language", "weekNum": 6, "x": 420, "y": 500, "summary": "Process natural language with TF-IDF, word vectors, transformers, and language models." }
+    ],
+    "edges": [
+      { "from": "w0", "to": "w1" },
+      { "from": "w0", "to": "w2" },
+      { "from": "w1", "to": "w3" },
+      { "from": "w2", "to": "w3" },
+      { "from": "w2", "to": "w4" },
+      { "from": "w3", "to": "w4" },
+      { "from": "w4", "to": "w5" },
+      { "from": "w4", "to": "w6" },
+      { "from": "w5", "to": "w6" }
+    ]
+  }
+}

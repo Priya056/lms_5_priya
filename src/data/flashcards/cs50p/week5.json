@@ -1,0 +1,8 @@
+[
+  {"front": "What is a unit test?", "back": "An automated test that verifies a specific piece of code works correctly."},
+  {"front": "How should test files be named?", "back": "test_filename.py or filename_test.py following the naming convention."},
+  {"front": "What does 'assert' do in pytest?", "back": "Checks if a condition is True; raises AssertionError if False."},
+  {"front": "What is the Arrange-Act-Assert pattern?", "back": "Set up test data, perform the action, then check the result."},
+  {"front": "How do you test if an exception is raised?", "back": "Using pytest.raises() context manager to verify exception type and behavior."},
+  {"front": "What are edge cases in testing?", "back": "Boundary conditions and unusual inputs (zero, negative, empty) that test robustness."}
+]
